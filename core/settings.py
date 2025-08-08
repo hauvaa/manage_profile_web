@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-9-)p_)yoxzfd6fgj$n3r_=ccxa!pg9zzhwmjs-c@kr=w4fn6@@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False  # Bắt buộc khi deploy
 
-ALLOWED_HOSTS = ['manage-profile-web.onrender.com', 'localhost']
+ALLOWED_HOSTS = ['manage-profile-web.onrender.com', 'manage-profile-web-4j53.onrender.com', 'localhost']
 
 
 # Application definition
