@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Tờ Trình</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <a href="{% url 'trang_chu' %}" class="btn btn-secondary me-3">← Quay lại</a>
+        <h3 class="text-center mb-4">TỜ TRÌNH</h3>
+        {% if lan_nhap_value %}
+            <p class="text-center text-muted">
+                <em>Đang tìm lần nhập: <strong>{{ lan_nhap_value }}</strong> — có <strong>{{ tong_so }}</strong> hồ sơ</em>
+            </p>
+        {% endif %}
+        <form method="get" class="mb-3 d-flex">
+            <input type="text" name="lan_nhap" class="form-control me-2" placeholder="Nhập Số Lần Nhập..." value="{{ lan_nhap_value }}">
+            <button type="submit" class="btn btn-primary">🔍 Tìm</button>
+        </form>
+
+        <table class="table table-bordered table-sm text-center align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>STT</th>
+                    <th>BẢNG KÊ ĐỢT GẮN</th>
+                    <th>ĐỢT NHẬP</th>
+                    <th>DANH BẠ CŨ</th>
+                    <th>HỢP ĐỒNG CŨ</th>
+                    <th>DANH BẠ MỚI</th>
+                    <th>HỢP ĐỒNG MỚI</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for index, ho_so in ho_sos %}
+                    <tr>
+                        <td>{{ index }}</td>
+                        <td>{{ ho_so.bang_ke_dot_gan }}</td>  <!-- Giả sử dot_nhap là FK đến BANGKEDOTGAN -->
+                        <td>{{ ho_so.dot_nhap }}</td>
+                        <td>{{ ho_so.db_cu|default_if_none:'-' }}</td>
+                        <td>{{ ho_so.hd_cu|default_if_none:'-' }}</td>
+                        <td>{{ ho_so.db_moi|default_if_none:'-' }}</td>
+                        <td>{{ ho_so.hd_moi|default_if_none:'-' }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="7">Không tìm thấy hồ sơ phù hợp.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

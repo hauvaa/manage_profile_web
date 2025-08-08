@@ -1,0 +1,84 @@
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<div class="container mt-5">
+    <div class="card shadow border-danger">
+        <div class="card-header bg-danger text-white text-center">
+            <h4 class="mb-0">⚠️ Xác nhận xóa hồ sơ</h4>
+        </div>
+        <div class="card-body">
+            <p class="fs-5 text-center mb-4">
+                Bạn có chắc chắn muốn xóa hồ sơ <strong>Số {{ ho_so.so_ho_so }}</strong> không?
+            </p>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm">
+                    <tbody>
+                        <tr>
+                            <th>Số Hồ Sơ</th>
+                            <td>{{ ho_so.so_ho_so }}</td>
+                            <th>Bảng Kê Đợt Gắn</th>
+                            <td>{{ ho_so.bang_ke_dot_gan }}</td>
+                        </tr>
+                        <tr>
+                            <th>Đợt Nhập</th>
+                            <td>{{ ho_so.dot_nhap }}</td>
+                            <th>Đợt</th>
+                            <td>{{ ho_so.dot }}</td>
+                        </tr>
+                        <tr>
+                            <th>DB Cũ</th>
+                            <td>{{ ho_so.db_cu|default_if_none:"-" }}</td>
+                            <th>HD Cũ</th>
+                            <td>{{ ho_so.hd_cu|default_if_none:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>DB Mới</th>
+                            <td>{{ ho_so.db_moi|default_if_none:"-" }}</td>
+                            <th>HD Mới</th>
+                            <td>{{ ho_so.hd_moi|default_if_none:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Giá Biểu</th>
+                            <td>{{ ho_so.gb }}</td>
+                            <th>Bù Định Mức</th>
+                            <td>{{ ho_so.bu_dm }}</td>
+                        </tr>
+                        <tr>
+                            <th>Hiệu Lực</th>
+                            <td>{{ ho_so.hieu_luc }}</td>
+                            <th>Mã HĐ</th>
+                            <td>{{ ho_so.ma_hd }}</td>
+                        </tr>
+                        <tr>
+                            <th>DS Lưu</th>
+                            <td>{{ ho_so.ds_luu }}</td>
+                            <th>Ghi Chú</th>
+                            <td>{{ ho_so.ghi_chu|default_if_none:"" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Trở Ngại</th>
+                            <td>{{ ho_so.tro_ngai|default_if_none:"" }}</td>
+                            <th>Quận</th>
+                            <td>{{ ho_so.quan }}</td>
+                        </tr>
+                        <tr>
+                            <th>Lần Nhập</th>
+                            <td>{{ ho_so.lan_nhap }}</td>
+                            <td colspan="2"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <form method="post" class="d-flex justify-content-center gap-3 mt-4">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger px-4">
+                    🗑️ Xóa
+                </button>
+                <a href="{% url 'tat_ca_ho_so' %}" class="btn btn-secondary px-4">
+                    ❌ Hủy
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
