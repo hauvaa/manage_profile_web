@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thống Kê Gắn Mới</title>
+    <style>
+        body {
+            font-family: 'Times New Roman',Times, serif;
+            font-size: 13px;
+            display: flex;
+            margin: 0;
+        }
+
+        .left-panel {
+            width: 33.33%;
+            padding: 20px;
+            border-right: 1px solid #ccc;
+            background-color: #f9f9f9;
+            min-height: 100vh;
+        }
+
+        .right-panel {
+            width: 66.67%;
+            padding: 30px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        table, th, td {
+            border: 1px solid #333;
+        }
+
+        th {
+            background-color: #ffeb3b;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #dcdcdc;
+        }
+
+        .total-row {
+            font-weight: bold;
+            background-color: #c8e6c9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="left-panel">
+        <form method="get">
+            <label for="year"><strong>Chọn năm:</strong></label>
+            <select name="year" id="year" onchange="this.form.submit()">
+                {% for year in years %}
+                    <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
+                {% endfor %}
+            </select>
+        </form>
+
+        {% if selected_year %}
+        <h2>THỐNG KÊ NĂM {{ selected_year }}</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>THÁNG</th>
+                    <th>Q5</th>
+                    <th>Q6</th>
+                    <th>Q8</th>
+                    <th>BTAN</th>
+                    <th>TỔNG</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in report_data %}
+                <tr>
+                    <td>{{ row.month }}</td>
+                    <td>{{ row.q5 }}</td>
+                    <td>{{ row.q6 }}</td>
+                    <td>{{ row.q8 }}</td>
+                    <td>{{ row.btan }}</td>
+                    <td>{{ row.total }}</td>
+                </tr>
+                {% endfor %}
+                <tr class="total-row">
+                    <td><strong>TỔNG</strong></td>
+                    <td>{{ total.q5 }}</td>
+                    <td>{{ total.q6 }}</td>
+                    <td>{{ total.q8 }}</td>
+                    <td>{{ total.btan }}</td>
+                    <td>{{ total.total }}</td>
+                </tr>
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+
+    <div class="right-panel">
+        <!-- Bạn có thể chừa trống phần này để sử dụng sau -->
+    </div>
+
+</body>
+</html>

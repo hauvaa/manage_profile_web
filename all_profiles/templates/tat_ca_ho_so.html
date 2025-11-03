@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Tất cả hồ sơ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Times New Roman',Times, serif;
+            font-size: 13px;
+        }
+
+        .container {
+            max-width: none;
+            width: 100%;
+        }
+
+        .table {
+            width: 100%;              /* Hoặc dùng giá trị lớn hơn nếu trong container nhỏ */
+            table-layout: fixed;      /* Bắt buộc để width cột được tôn trọng */
+            border-collapse: collapse;
+        }
+
+        th, td {
+            text-align: center;
+            vertical-align: middle;
+            font-size: 14px;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+        }
+
+        .table th {
+            background-color: #ffe699;
+            white-space: wrap;
+        }
+
+        .table td {
+            background-color: #fdfdfd;
+        }
+
+        /* Cột cần wrap: GHI CHÚ và TRỞ NGẠI */
+        .table th.col-ghi-chu,
+        .table td.col-ghi-chu,
+        .table th.col-tro-ngai,
+        .table td.col-tro-ngai {
+            width: 200px;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        /* Các cột mã/đối tượng như DB/HD cũ/mới: giữ nguyên width nhỏ */
+        .table th.col-db-cu,
+        .table td.col-db-cu,
+        .table th.col-hd-cu,
+        .table td.col-hd-cu,
+        .table th.col-db-moi,
+        .table td.col-db-moi,
+        .table th.col-hd-moi,
+        .table td.col-hd-moi {
+            width: 100px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .floating-menu {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 9999;
+            background: #fff8dc;
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+            cursor: move;
+            width: 120px;
+            text-align: center;
+
+            /* Thêm các dòng sau để khắc phục dư chiều cao */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-height: fit-content;
+        }
+
+        .menu-options button {
+            font-size: 13px;
+        }
+
+        #toggle-menu {
+            width: 100%;
+        }
+
+        .pagination-container {
+          margin-top: 20px;
+        }
+
+        .pagination-link {
+          display: inline-block;
+          padding: 8px 14px;
+          margin: 0 4px;
+          text-decoration: none;
+          background-color: #f0f0f0;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          color: #333;
+          font-weight: bold;
+          transition: background-color 0.3s ease;
+        }
+
+        .pagination-link:hover {
+          background-color: #007bff;
+          color: white;
+          border-color: #007bff;
+        }
+
+        .pagination-current {
+          display: inline-block;
+          margin: 0 8px;
+          font-weight: bold;
+          color: #555;
+        }
+
+    </style>
+
+</head>
+<body>
+<div class="container-fluid mt-4">
+    <h3 class="text-center mb-4">DANH SÁCH HỒ SƠ GẮN MỚI</h3>
+    <div style="overflow-x: auto;">
+        <div class="pagination-container">
+          {% if current_page > 1 %}
+            <a href="?page=1" class="pagination-link">Trang đầu</a>
+            <a href="?page={{ current_page|add:"-1" }}" class="pagination-link">Trang trước</a>
+          {% endif %}
+
+          <span class="pagination-current">Trang {{ current_page }} / {{ total_pages }}</span>
+
+          {% if current_page < total_pages %}
+            <a href="?page={{ current_page|add:"1" }}" class="pagination-link">Trang sau</a>
+            <a href="?page={{ total_pages }}" class="pagination-link">Trang cuối</a>
+          {% endif %}
+        </div>
+        <table class="table table-bordered table-hover table-sm align-middle">
+            <thead class="table-warning">
+                <tr>
+                    <th>STT</th>
+                    <th>BẢNG KÊ ĐỢT GÁN</th>
+                    <th>ĐỢT NHẬP</th>
+                    <th>SỐ HỒ SƠ</th>
+                    <th class="col-db-cu">DB CŨ</th>
+                    <th class="col-hd-cu">HD CŨ</th>
+                    <th class="col-db-moi">DB MỚI</th>
+                    <th class="col-hd-moi">HD MỚI</th>
+                    <th>ĐỢT</th>
+                    <th>GB</th>
+                    <th>BÙ ĐM</th>
+                    <th>HIỆU LỰC</th>
+                    <th>MÃ HỢP ĐỒNG</th>
+                    <th>DS LƯU</th>
+                    <th class="col-ghi-chu">GHI CHÚ</th>
+                    <th class="col-tro-ngai">TRỞ NGẠI</th>
+                    <th>QUẬN</th>
+                    <th>LẦN NHẬP</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for index, ho_so in ho_sos %}
+                <tr>
+                    <td>{{ index }}</td>
+                    <td>{{ ho_so.bang_ke_dot_gan }}</td>
+                    <td>{{ ho_so.dot_nhap }}</td>
+                    <td>{{ ho_so.so_ho_so }}</td>
+                    <td class="col-db-cu">{{ ho_so.db_cu|default_if_none:'-' }}</td>
+                    <td class="col-hd-cu">{{ ho_so.hd_cu|default_if_none:'-' }}</td>
+                    <td class="col-db-moi" style="color: red;">{{ ho_so.db_moi|default_if_none:'-' }}</td>
+                    <td class="col-hd-moi" style="color: red;">{{ ho_so.hd_moi|default_if_none:'-' }}</td>
+                    <td>{{ ho_so.dot|default_if_none:'' }}</td>
+                    <td {% if ho_so.gb != 11 %}style="color: red;"{% endif %}>{{ ho_so.gb }}</td>
+                    <td {% if ho_so.bu_dm != "0" %}style="color: red;"{% endif %}>{{ ho_so.bu_dm }}</td>
+                    <td>{{ ho_so.hieu_luc|default_if_none:'' }}</td>
+                    <td>{{ ho_so.ma_hd|default_if_none:'-' }}</td>
+                    <td>{{ ho_so.ds_luu|default_if_none:'' }}</td>
+                    <td class="col-ghi-chu">{{ ho_so.ghi_chu|default_if_none:'' }}</td>
+                    <td class="col-tro-ngai">{{ ho_so.tro_ngai|default_if_none:'' }}</td>
+                    <td>{{ ho_so.quan }}</td>
+                    <td>{{ ho_so.lan_nhap|default_if_none:'' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="pagination-container">
+          {% if current_page > 1 %}
+            <a href="?page=1" class="pagination-link">Trang đầu</a>
+            <a href="?page={{ current_page|add:"-1" }}" class="pagination-link">Trang trước</a>
+          {% endif %}
+
+          <span class="pagination-current">Trang {{ current_page }} / {{ total_pages }}</span>
+
+          {% if current_page < total_pages %}
+            <a href="?page={{ current_page|add:"1" }}" class="pagination-link">Trang sau</a>
+            <a href="?page={{ total_pages }}" class="pagination-link">Trang cuối</a>
+          {% endif %}
+        </div>
+    </div>
+</div>
+<!-- Floating Menu Button -->
+<div id="floating-menu" class="floating-menu">
+    <button id="toggle-menu" class="btn btn-warning btn-sm">☰</button>
+    <div id="menu-options" class="menu-options d-none">
+        <button class="btn btn-secondary btn-sm w-100 my-1" onclick="window.location.href='/'">🏠 Trang chủ</button>
+        <a href="{% url 'them_ho_so' %}" class="btn btn-success btn-sm w-100 my-1">➕ Thêm</a>
+        <button onclick="nhapVaChuyenHuong('{% url 'sua_ho_so' %}', 'sửa')" class="btn btn-primary btn-sm w-100 my-1">✏️ Sửa</button>
+        <button onclick="nhapVaChuyenHuong('{% url 'xoa_ho_so' %}', 'xóa')" class="btn btn-danger btn-sm w-100 my-1">🗑️ Xóa</button>
+        <button id="search-toggle" class="btn btn-info btn-sm w-100 my-1">🔍 Tìm kiếm</button>
+        <!-- ✅ Lựa chọn loại tìm -->
+        <div id="search-options" class="d-none mt-2">
+            <select id="search-field" class="form-select form-select-sm my-1">
+                <option value="">-- Chọn trường cần tìm --</option>
+                <option value="bang_ke_dot_gan">Bảng kê đợt gắn</option>
+                <option value="dot_nhap">Đợt nhập</option>
+                <option value="so_ho_so">Số hồ sơ</option>
+                <option value="danh_ba">Danh bạ (DB cũ/mới)</option>
+                <option value="hop_dong">Hợp đồng (HD cũ/mới)</option>
+                <option value="dot">Đợt</option>
+                <option value="gb">Giá Biểu</option>
+                <option value="bu_dm">Bù Định Mức</option>
+                <option value="hieu_luc">Hiệu lực</option>
+                <option value="ma_hop_dong">Mã hợp đồng</option>
+                <option value="ds_luu">DS lưu</option>
+                <option value="ghi_chu">Ghi Chú</option>
+                <option value="tro_ngai">Trở Ngại</option>
+                <option value="quan">Quận</option>
+                <option value="lan_nhap">Lần Nhập</option>
+            </select>
+
+            <input id="search-value" type="text" class="form-control form-control-sm my-1" placeholder="Nhập giá trị cần tìm...">
+            <button class="btn btn-sm btn-success w-100" onclick="submitSearch()">🔎 Tìm</button>
+        </div>
+        <button onclick="window.location.href='{% url 'xuat_excel' %}'" class="btn btn-outline-success btn-sm w-100 my-1">📥 Xuất Excel</button>
+        <button onclick="topFunction()" class="btn btnBackToTop btn-outline-secondary btn-sm w-100 my-1">⬆ Quay lại đầu</button>
+    </div>
+</div>
+<script>
+    // Toggle hiển thị menu
+    document.getElementById('toggle-menu').addEventListener('click', function () {
+        const menu = document.getElementById('menu-options');
+        menu.classList.toggle('d-none');
+    });
+
+    // Kéo thả menu
+    (function () {
+        const menu = document.getElementById('floating-menu');
+        const dragHandle = document.getElementById('toggle-menu');  // chỉ nút màu vàng
+        let isDragging = false, offsetX = 0, offsetY = 0;
+
+        dragHandle.addEventListener('mousedown', function (e) {
+            isDragging = true;
+            offsetX = e.clientX - menu.offsetLeft;
+            offsetY = e.clientY - menu.offsetTop;
+            e.preventDefault();  // tránh bị chọn text
+        });
+
+        document.addEventListener('mousemove', function (e) {
+            if (isDragging) {
+                menu.style.left = (e.clientX - offsetX) + 'px';
+                menu.style.top = (e.clientY - offsetY) + 'px';
+            }
+        });
+
+        document.addEventListener('mouseup', function () {
+            isDragging = false;
+        });
+    })();
+
+    // nhap va chuyen huong
+    function nhapVaChuyenHuong(actionUrl, actionName) {
+        const soHoSo = prompt(`Nhập số hồ sơ để ${actionName}:`);
+        if (soHoSo) {
+            window.location.href = `${actionUrl}?so_ho_so=${soHoSo}`;
+        }
+    }
+
+    // search
+    document.getElementById('search-toggle').addEventListener('click', function () {
+        const options = document.getElementById('search-options');
+        options.classList.toggle('d-none');
+    });
+
+    function submitSearch() {
+        const field = document.getElementById('search-field').value;
+        const value = document.getElementById('search-value').value;
+        if (!field || !value) {
+            alert('Vui lòng chọn trường và nhập giá trị cần tìm!');
+            return;
+        }
+        // Điều chỉnh đúng đường dẫn search
+        const url = `/search/?search_field=${encodeURIComponent(field)}&search_value=${encodeURIComponent(value)}`;
+        window.location.href = url;
+    }
+
+    let btn = document.getElementById("btnBackToTop");
+
+    window.onscroll = function() {
+      if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+        btn.style.display = "block";
+      } else {
+        btn.style.display = "none";
+      }
+    };
+
+    function topFunction() {
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+</script>
+
+</body>
+</html>
