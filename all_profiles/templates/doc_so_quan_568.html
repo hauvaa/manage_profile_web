@@ -53,6 +53,9 @@
                     </tr>
                     {% endfor %}
                 {% endfor %}
+                {% empty %}
+                    <tr><td colspan="7">Không tìm thấy hồ sơ phù hợp.</td></tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
